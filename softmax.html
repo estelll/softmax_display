@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+	<meta charset="utf-8">
+	<title>softmax function</title>
+	<link type="text/css" rel = "stylesheet" href="style.css">
+	<script src = "Chart.js"></script>
+</head>
+<body onload="putinValue()">
+<div id = "displayDiv" style="display: none;">
+	<center><div id = "header">
+		<label>Stack a softmax layer</label>
+		<img class="imgBtn" src="pic/add_layer.png" onclick="addLayer();">
+		<label>Remove a softmax layer</label>
+		<img class="imgBtn" src="pic/del_layer.png" onclick="deleteLayer();">
+		<label>Add data with value:</label>
+		<input type="text" id = "addTxtTxt" value = "" size = "5">
+		<img class="imgBtn" src="pic/add_ele.png" onclick="addElement();">
+		<label>Delete data by id:</label>
+		<input type="text" id = "deleTxtTxt" value = "" size = "5">
+		<img  class="imgBtn" src="pic/del_ele.png" onclick="deleteElement();">
+	</div></center>
+	<canvas id="mychart" width="100 px" height="20"></canvas>
+	<div id = "rangeDiv"></div>
+	<div id = "textDiv"></div>
+</div>
+
+<div id = "initDiv">
+	<div id = "hintDiv">
+	<label id = "subLabel">Please initialize your comma-delimited array: </label>
+	</div>
+	<div id = "putinDiv">
+	<input type="text" id = "initTxt" placeholder = "10,4,10,14,23">
+	</div>
+	<div id = "btnDiv">
+		<a href="#" class="myButton" onclick="initData()">Submit</a>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+
+	// Parameters setting
+	var  borderColors =  [
+	        'rgba(255,99,132,1)',
+	        'rgba(54, 162, 235, 1)',
+	        'rgba(255, 206, 86, 1)',
+	        'rgba(75, 192, 192, 1)',
+	        'rgba(153, 102, 255, 1)',
+	        'rgba(255, 159, 64, 1)'
+            ]
+	var maxLayer = 5;
+	var oriData = [];
+	var position = new Array();
+	var softmaxData = new Array();
+	var layer = 0;
+
+	var cvs = document.getElementById("mychart");
+	var ctx = document.getElementById("mychart").getContext("2d");
+	var mychart;
+
+	function putinValue(){
+		// alert("putinValue() excuted.");
+		var displayDiv = document.getElementById("displayDiv");
+		var initDiv = document.getElementById("initDiv");
+		displayDiv.style.display = "none";
+	}
+	function initData(){
+		// alert("initData() excuted.");
+		var strData = document.getElementById("initTxt").value;
+		oriData = strData.split(',');
+		oriData = oriData.map(y => parseFloat(y));
+		var displayDiv = document.getElementById("displayDiv");
+		var initDiv = document.getElementById("initDiv");
+		displayDiv.style.display = "block";
+		initDiv.style.display = "none";
+		init();
+	}
+	function createLabels(){
+		var labels = [];
+		for(var i = 0; i < oriData.length; i++){
+			labels.push('x_' + i.toString());
+		}
+		return labels;
+	}
+	// Initializing
+	function init(){
+		// alert("init() excuted.");
+		if(oriData.length > 0){
+			softmaxData.push(oriData.map(y => Math.exp(y) / (oriData.map(y=>Math.exp(y)).reduce((a,b)=>a+b))));
+		}
+		var data = {
+		    type: 'line',
+		    data: {
+		        labels: createLabels(),
+		        datasets: [{
+		            label: 'Layer' + (layer + 1).toString(),
+		            data:softmaxData[0],
+		            borderColor: borderColors[layer],
+		            borderWidth: 1,
+		            fill:false
+		        }]
+		    },
+		    options: {
+		        scales: {
+		            yAxes: [{
+		                ticks: {
+		                    beginAtZero:true
+		                		}
+		            		}]
+		        		}
+		    }
+		    
+			};		
+		mychart = new Chart(ctx,data);
+		placeRange();
+		placeText();
+		initializeRange();
+
+	}
+	function place(){
+		// alert("place() excuted.");
+		placeRange();
+		placeText();
+	}
+
+	function placeRange(){
+		// alert("placeRange() excuted.");
+		var stride = (mychart.width -55) / (oriData.length - 1);
+		var rangeDiv = document.getElementById("rangeDiv");
+		var innerH = "";
+		for (var i = 0; i < oriData.length; i++){
+			position.push(i * stride);
+			innerH += "<input id=\"slider_" + i.toString() + "\"  type=\"range\" min=\"0\" max=\"100\" step=\"0.1\" orient=\"vertical\" onchange=\"updateText(this.value," + i.toString() + ");\" style = \"margin-left:" + (30 + i*stride).toString() + "px\" />"
+		}
+		rangeDiv.innerHTML = innerH;
+	}
+	function placeText(){
+		// alert("placeText() excuted.");
+		var stride = (mychart.width - 55) / (oriData.length - 1);
+		var rangeDiv = document.getElementById("textDiv");
+		var innerH = "";
+		for (var i = 0; i < oriData.length; i++){
+			position.push(i * stride);
+			innerH += "<input id=\"text_" + i.toString() + "\"  type=\"text\" value = \"" + oriData[i].toString() + "\" onchange=\"updateRange(this.value," + i.toString() + ");\" style = \"margin-left:" + (5 + i*stride).toString() + "px\"  size = \"2.5\"/>"
+		}
+		rangeDiv.innerHTML = innerH;
+	}
+	function initializeRange(){
+		// alert("initializeRange() excuted.");
+		for (var i =0; i < oriData.length; i++){
+			var tmpRange = document.getElementById("slider_" + i.toString());
+			var tmpText = document.getElementById("text_" + i.toString());
+			tmpRange.value = tmpText.value;
+		}
+	}
+	// Update functions
+	function updateText(val, idx){
+		// alert(updateText() excuted.);
+		document.getElementById("text_" + idx.toString()).value = val;
+		changeEle(val, idx);
+
+	};
+	function updateRange(val, idx){
+		document.getElementById("slider_" + idx).value = val;
+		changeEle(val, idx);
+	}
+	function changeEle(val, idx){ // Change the element of the original data array.
+		oriData[idx] = val;
+		softmaxFunc();
+		updateChart();
+	}
+	function softmaxFunc(){ // calculate the softmax results for each layer.
+		// alert("softmaxFunc() excuted.");
+		var softmaxTmpData = [];
+		var softmax = oriData.map(y => Math.exp(y) / (oriData.map(y=>Math.exp(y)).reduce((a,b)=>a+b)));
+		softmaxTmpData.push(softmax);
+		for (var i = 1; i <= layer; i++){
+			softmax = softmaxTmpData[i - 1].map(y => Math.exp(y) / (softmaxTmpData[i-1].map(y=>Math.exp(y)).reduce((a,b)=>a+b)));
+			softmaxTmpData.push(softmax);
+		};
+		softmaxData = softmaxTmpData;
+	}
+	function updateChart(){
+		// alert("updateChart() excuted.");
+		var data = [];
+		for (var i = 0;i <= layer;i++){
+			mychart.data.datasets[i].data = softmaxData[i];
+		}
+
+		mychart.update();
+	}
+
+	function deleteElement(){
+		// alert("deleteElement() excuted.");
+		var idx = document.getElementById("deleTxtTxt").value;
+
+		if(isNaN(idx) || idx.length == 0){
+			alert("Not a valid value.");
+			return;
+		}
+		if(idx >= oriData.length){
+			alert("Overflow");
+			return;
+		}
+		oriData.splice(idx,1);
+		mychart.data.labels = createLabels();
+		softmaxFunc();
+		updateChart();
+		place();
+		document.getElementById("deleTxtTxt").value = "";
+
+	}
+	function addElement(){
+		// alert("addElement() excuted.");
+		var value = document.getElementById("addTxtTxt").value;
+		if(isNaN(value) || value.length == 0){
+			alert("Not a valid value.");
+			return;
+		}
+		oriData.push(value);
+		mychart.data.labels = createLabels();
+		softmaxFunc();
+		updateChart();
+		place();
+		document.getElementById("addTxtTxt").value = "";
+
+	}
+	function addLayer(){
+		// alert("addLayer() excuted.");
+		if (layer == maxLayer) {
+			alert('Max layer!')
+			return
+		}
+		softmaxData.push(softmaxData[layer].map(y => Math.exp(y) / (softmaxData[layer].map(y=>Math.exp(y)).reduce((a,b)=>a+b))));
+		layer = layer + 1;
+		var newdata = {
+            label: 'Layer' + (layer + 1).toString(),
+            data: softmaxData[layer],
+            borderColor: borderColors[layer],
+            borderWidth: 1,
+            fill:false
+        }
+		mychart.data.datasets.push(newdata);
+		mychart.update();
+	}
+	function deleteLayer(){
+		// alert("deleteLayer() excuted.");
+		if (layer == 0){
+			alert('It is only one layer left.');
+			return;
+		}
+		softmaxData.pop();
+		mychart.data.datasets.pop();
+		layer = layer - 1;
+		mychart.update();
+	}
+</script>
+</body>
+</html>

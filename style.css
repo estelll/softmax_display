@@ -1,0 +1,106 @@
+input[type=range][orient=vertical]
+{
+    writing-mode: bt-lr; /* IE */
+    -webkit-appearance: slider-vertical; /* WebKit */
+    width: 4px;
+    height: 160px;
+    padding: 0 0px;
+    position: absolute;
+    /*position: relative;*/
+    /*top:10px;*/
+    /*left: 0px;*/
+}
+input[type=text]
+{
+	position: absolute;
+}
+input[type=button]
+{
+	color:#08233e;
+	font-family: Georgia, serif;
+}
+#rangeDiv, #textDiv
+{
+	/*display: inline-block;*/
+	height: 180px;
+}
+#addTxtTxt, #deleTxtTxt
+{
+	display: inline-block;
+	position: relative;
+	margin-left: 0px;
+}
+#header
+{
+	margin: 0 auto;
+	margin-bottom: 30px;
+	margin-top: 30px;
+	/*height: 25px;*/
+}
+label
+{
+	margin-left: 10px;
+	font-family: Georgia, serif;
+	vertical-align: center;
+}
+img
+{
+	max-height: 100%;
+	vertical-align: bottom;
+}
+#initDiv
+{
+	width: 800px;
+	height: 250px;
+	margin: auto;
+	position: absolute;
+	top: 0;bottom: 0;
+	left: 0;right: 0;
+	max-width: 100%;
+	max-height: 100%;
+	overflow: auto;
+	text-align: center;
+}
+#hintDiv
+{
+	position: relative;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+#putinDiv
+{
+	position: relative;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	margin-left: -180px;
+}
+#btnDiv
+{
+	position: relative;
+	margin-top: 40px;
+	margin-bottom: 10px;
+}
+.myButton {
+	background-color:#5B9BD5;
+	-moz-border-radius:42px;
+	-webkit-border-radius:42px;
+	border-radius:42px;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Georgia;
+	font-size:19px;
+	padding:10px 20px;
+	text-decoration:none;
+}
+.myButton:hover {
+	background-color:#3078BA;
+}
+.myButton:active {
+	position:relative;
+	top:1px;
+}
+.imgBtn
+{
+	cursor: pointer;
+}
