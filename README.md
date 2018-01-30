@@ -1,4 +1,4 @@
-A simple display of softmax.
+A simple display of softmax. Just open *softmax.html*.
 
 ## Usage
 You can type in an array of float numbers on the landing page. 
